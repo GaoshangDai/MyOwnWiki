@@ -33,6 +33,7 @@
                              targetPackage="com.gsdai.myownwiki.mapper"
                              type="XMLMAPPER"/>
 
-        <table tableName="demo" domainObjectName="Demo"/>
+<!--        <table tableName="demo" domainObjectName="Demo"/>-->
+        <table tableName="ebook"/>
     </context>
 </generatorConfiguration>
