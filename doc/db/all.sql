@@ -12,7 +12,7 @@ create table `ebook` (
                          primary key (`id`)
 ) engine=innodb default charset=utf8mb4 comment='ebooks';
 
-insert into `ebook` (id, name, description) values (1, 'Spring Boot Intros', 'Entry Java development, the best preferred framework for enterprise-level application development');
+insert into `ebook` (id, name, description) values (1, 'SpringBoot Intros', 'Entry Java development, the best preferred framework for enterprise-level application development');
 insert into `ebook` (id, name, description) values (2, 'Vue Intros', 'Entry Vue development, the best preferred framework for enterprise-level application development');
 insert into `ebook` (id, name, description) values (3, 'Python Intros', 'Entry Python development, the best preferred framework for enterprise-level application development');
 insert into `ebook` (id, name, description) values (4, 'Mysql Intros', 'Entry MySQL development, the best preferred framework for enterprise-level application development');
