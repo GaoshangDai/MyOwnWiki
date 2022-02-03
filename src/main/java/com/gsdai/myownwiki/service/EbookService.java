@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 public class EbookService {
-    public static final EbookExample EBOOK_EXAMPLE = new EbookExample();
+
     @Resource
     private EbookMapper ebookMapper;
 
@@ -23,8 +23,6 @@ public class EbookService {
         ebookExampleCriteria.andNameLike("%" + req.getName() + "%");
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
-        List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
-
-        return list;
+        return CopyUtil.copyList(ebookList, EbookResp.class);
     }
 }
