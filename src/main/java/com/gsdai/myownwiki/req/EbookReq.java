@@ -1,4 +1,4 @@
-package req;
+package com.gsdai.myownwiki.req;
 
 public class EbookReq {
     private Long id;

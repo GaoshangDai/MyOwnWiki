@@ -6,7 +6,7 @@ import com.gsdai.myownwiki.service.EbookService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import req.EbookReq;
+import com.gsdai.myownwiki.req.EbookReq;
 
 import javax.annotation.Resource;
 import java.util.List;
