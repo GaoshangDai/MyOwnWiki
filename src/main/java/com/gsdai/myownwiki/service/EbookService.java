@@ -7,6 +7,7 @@ import com.gsdai.myownwiki.req.EbookReq;
 import com.gsdai.myownwiki.resp.EbookResp;
 import com.gsdai.myownwiki.util.CopyUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -20,7 +21,9 @@ public class EbookService {
     public List<EbookResp> list(EbookReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria ebookExampleCriteria = ebookExample.createCriteria();
-        ebookExampleCriteria.andNameLike("%" + req.getName() + "%");
+        if (!ObjectUtils.isEmpty(req.getName())) {
+            ebookExampleCriteria.andNameLike("%" + req.getName() + "%");
+        }
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
         return CopyUtil.copyList(ebookList, EbookResp.class);
