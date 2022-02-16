@@ -7,8 +7,8 @@
 </template>
 
 <script lang="ts">
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue';
+import {UserOutlined, LaptopOutlined, NotificationOutlined} from '@ant-design/icons-vue';
+import {defineComponent, ref} from 'vue';
 import theHeader from '@/components/theHeader.vue';
 import theFooter from "@/components/theFooter.vue";
 
