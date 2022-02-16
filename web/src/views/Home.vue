@@ -57,14 +57,16 @@
 
 <script lang="ts">
 import {defineComponent, ref} from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import axios from 'axios';
 
 export default defineComponent({
   name: 'Home',
-  components: {
-    HelloWorld,
-  },
   setup() {
+    console.log("setup")
+    axios.get("http://localhost:8082/ebook/list?name=Python")
+        .then((res) => {
+          console.log(res);
+        })
     return {
       selectedKeys2: ref<string[]>(['1']),
       openKeys: ref<string[]>(['sub1']),
