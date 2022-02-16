@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {defineComponent, ref} from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 
 export default defineComponent({
@@ -64,5 +64,11 @@ export default defineComponent({
   components: {
     HelloWorld,
   },
+  setup() {
+    return {
+      selectedKeys2: ref<string[]>(['1']),
+      openKeys: ref<string[]>(['sub1']),
+    };
+  }
 });
 </script>
