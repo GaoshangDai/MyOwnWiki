@@ -80,18 +80,18 @@
 import {defineComponent, ref, onMounted} from 'vue'
 import axios from 'axios'
 
-const listData: any = []
-for (let i = 0; i < 23; i++) {
-  listData.push({
-    href: 'https://www.antdv.com/',
-    title: `ant design vue part ${i}`,
-    avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-    description:
-        'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-    content:
-        'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-  });
-}
+// const listData: any = []
+// for (let i = 0; i < 23; i++) {
+//   listData.push({
+//     href: 'https://www.antdv.com/',
+//     title: `ant design vue part ${i}`,
+//     avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+//     description:
+//         'Ant Design, a design language for background applications, is refined by Ant UED Team.',
+//     content:
+//         'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
+//   });
+// }
 
 
 export default defineComponent({
@@ -101,7 +101,7 @@ export default defineComponent({
     const ebooks = ref();
 
     onMounted(() => {
-      axios.get("http://localhost:8082/ebook/list").then((res) => {
+      axios.get(process.env.VUE_APP_SERVER + "/ebook/list").then((res) => {
         const data = res.data;
         ebooks.value = data.content
         console.log(res)
@@ -111,7 +111,7 @@ export default defineComponent({
       selectedKeys2: ref<string[]>(['1']),
       openKeys: ref<string[]>(['sub1']),
       ebooks,
-      listData,
+      // listData,
       actions: [
         {type: 'StarOutlined', text: '156'},
         {type: 'LikeOutlined', text: '156'},
