@@ -97,14 +97,12 @@ import axios from 'axios'
 export default defineComponent({
   name: 'Home',
   setup() {
-    console.log("setup")
     const ebooks = ref();
 
     onMounted(() => {
       axios.get("/ebook/list").then((res) => {
         const data = res.data;
         ebooks.value = data.content
-        console.log(res)
       })
     })
     return {
