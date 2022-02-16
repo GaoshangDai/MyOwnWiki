@@ -6,9 +6,15 @@
         v-model:selectedKeys="selectedKeys1"
         :style="{ lineHeight: '64px' }"
     >
-      <a-menu-item key="1">nav 1</a-menu-item>
-      <a-menu-item key="2">nav 2</a-menu-item>
-      <a-menu-item key="3">nav 3</a-menu-item>
+      <a-menu-item key="/">
+        <router-link to="/">Home</router-link>
+      </a-menu-item>
+      <a-menu-item key="/admin/books">
+        <router-link to="/admin/books">Manage Ebooks</router-link>
+      </a-menu-item>
+      <a-menu-item key="/about">
+        <router-link to="/about">About</router-link>
+      </a-menu-item>
     </a-menu>
   </a-layout-header>
 </template>
@@ -20,7 +26,7 @@ export default defineComponent({
   name: 'the-header',
   setup() {
     return {
-      selectedKeys1: ref<string[]>(['1']),
+      selectedKeys1: ref<string[]>(['home']),
     };
   }
 });
