@@ -1,13 +1,12 @@
 package com.gsdai.myownwiki.controller;
 
-import com.gsdai.myownwiki.req.EbookReq;
+import com.gsdai.myownwiki.req.EbookQueryReq;
+import com.gsdai.myownwiki.req.EbookSaveReq;
 import com.gsdai.myownwiki.resp.CommonResp;
-import com.gsdai.myownwiki.resp.EbookResp;
+import com.gsdai.myownwiki.resp.EbookQueryResp;
 import com.gsdai.myownwiki.resp.PageResp;
 import com.gsdai.myownwiki.service.EbookService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -18,10 +17,17 @@ public class EbookController {
     private EbookService ebookService;
 
     @GetMapping("/list")
-    public CommonResp list(EbookReq req) {
-        CommonResp<PageResp<EbookResp>> commonResp = new CommonResp<>();
-        PageResp<EbookResp> list = ebookService.list(req);
+    public CommonResp list(EbookQueryReq req) {
+        CommonResp<PageResp<EbookQueryResp>> commonResp = new CommonResp<>();
+        PageResp<EbookQueryResp> list = ebookService.list(req);
         commonResp.setContent(list);
+        return commonResp;
+    }
+
+    @PostMapping("/edit")
+    public CommonResp edit(@RequestBody EbookSaveReq req) {
+        CommonResp commonResp = new CommonResp<>();
+        ebookService.edit(req);
         return commonResp;
     }
 }

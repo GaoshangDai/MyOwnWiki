@@ -5,8 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.gsdai.myownwiki.domain.Ebook;
 import com.gsdai.myownwiki.domain.EbookExample;
 import com.gsdai.myownwiki.mapper.EbookMapper;
-import com.gsdai.myownwiki.req.EbookReq;
-import com.gsdai.myownwiki.resp.EbookResp;
+import com.gsdai.myownwiki.req.EbookQueryReq;
+import com.gsdai.myownwiki.req.EbookSaveReq;
+import com.gsdai.myownwiki.resp.EbookQueryResp;
 import com.gsdai.myownwiki.resp.PageResp;
 import com.gsdai.myownwiki.util.CopyUtil;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class EbookService {
     @Resource
     private EbookMapper ebookMapper;
 
-    public PageResp<EbookResp> list(EbookReq req) {
+    public PageResp<EbookQueryResp> list(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria ebookExampleCriteria = ebookExample.createCriteria();
         if (!ObjectUtils.isEmpty(req.getName())) {
@@ -32,10 +33,19 @@ public class EbookService {
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
 
-        List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
-        PageResp<EbookResp> pageResp = new PageResp<>();
+        List<EbookQueryResp> list = CopyUtil.copyList(ebookList, EbookQueryResp.class);
+        PageResp<EbookQueryResp> pageResp = new PageResp<>();
         pageResp.setTotal(pageInfo.getTotal());
         pageResp.setList(list);
         return pageResp;
+    }
+
+    public void edit(EbookSaveReq req) {
+        Ebook ebook = CopyUtil.copy(req, Ebook.class);
+        if (ObjectUtils.isEmpty(req.getId())) {
+            ebookMapper.insert(ebook);
+        } else {
+            ebookMapper.updateByPrimaryKey(ebook);
+        }
     }
 }
