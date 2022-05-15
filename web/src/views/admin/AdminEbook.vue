@@ -3,6 +3,11 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <p>
+        <a-button type="primary" @click="add()" size="large">
+          New
+        </a-button>
+      </p>
       <a-table
           :columns="columns"
           :row-key="record => record.id"
@@ -133,7 +138,7 @@ export default defineComponent({
     const modalLoading = ref(false)
     const handleModalOk = () => {
       modalLoading.value = true
-      axios.post("/ebook/edit", ebook.value).then((response) => {
+      axios.post("/ebook/save", ebook.value).then((response) => {
         const data = response.data
         if (data.success) {
           modalVisible.value = false
@@ -145,9 +150,15 @@ export default defineComponent({
         }
       })
     }
+
     const edit = (record: any) => {
       modalVisible.value = true
       ebook.value = record
+    }
+
+    const add = () => {
+      modalVisible.value = true
+      ebook.value = {}
     }
 
     onMounted(() => {
@@ -164,6 +175,7 @@ export default defineComponent({
       loading,
       handleTableChange,
       edit,
+      add,
       modalVisible,
       modalLoading,
       handleModalOk,
