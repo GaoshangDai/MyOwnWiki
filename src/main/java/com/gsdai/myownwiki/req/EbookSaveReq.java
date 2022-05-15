@@ -1,8 +1,11 @@
 package com.gsdai.myownwiki.req;
 
+import javax.validation.constraints.NotNull;
+
 public class EbookSaveReq {
     private Long id;
 
+    @NotNull(message = "name cannot be null")
     private String name;
 
     private Long category1Id;
