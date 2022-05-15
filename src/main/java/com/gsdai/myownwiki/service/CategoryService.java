@@ -1,14 +1,11 @@
 package com.gsdai.myownwiki.service;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.gsdai.myownwiki.domain.Category;
 import com.gsdai.myownwiki.domain.CategoryExample;
 import com.gsdai.myownwiki.mapper.CategoryMapper;
 import com.gsdai.myownwiki.req.CategoryQueryReq;
 import com.gsdai.myownwiki.req.CategorySaveReq;
 import com.gsdai.myownwiki.resp.CategoryQueryResp;
-import com.gsdai.myownwiki.resp.PageResp;
 import com.gsdai.myownwiki.util.CopyUtil;
 import com.gsdai.myownwiki.util.SnowFlake;
 import org.springframework.stereotype.Service;
@@ -26,19 +23,13 @@ public class CategoryService {
     @Resource
     private SnowFlake snowFlake;
 
-    public PageResp<CategoryQueryResp> list(CategoryQueryReq req) {
+    public List<CategoryQueryResp> all() {
         CategoryExample categoryExample = new CategoryExample();
-        CategoryExample.Criteria categoryExampleCriteria = categoryExample.createCriteria();
-
-        PageHelper.startPage(req.getPage(), req.getSize());
+        categoryExample.setOrderByClause("sort asc");
         List<Category> categoryList = categoryMapper.selectByExample(categoryExample);
-        PageInfo<Category> pageInfo = new PageInfo<>(categoryList);
 
         List<CategoryQueryResp> list = CopyUtil.copyList(categoryList, CategoryQueryResp.class);
-        PageResp<CategoryQueryResp> pageResp = new PageResp<>();
-        pageResp.setTotal(pageInfo.getTotal());
-        pageResp.setList(list);
-        return pageResp;
+        return list;
     }
 
     public void save(CategorySaveReq req) {
