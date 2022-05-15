@@ -18,7 +18,7 @@
       <a-table
           :columns="columns"
           :row-key="record => record.id"
-          :data-source="categorys"
+          :data-source="level1"
           :loading="loading"
           :pagination="false"
       >
@@ -69,7 +69,7 @@
 import { defineComponent, onMounted, ref } from 'vue'
 import axios from 'axios'
 import { message } from "ant-design-vue"
-import {Tool} from "../../../util/tool";
+import { Tool } from "../../../util/tool";
 
 export default defineComponent({
   name: 'AdminCategory',
@@ -99,6 +99,9 @@ export default defineComponent({
       }
     ]
 
+    const level1 = ref()
+    level1.value = []
+
     const handleQuery = () => {
       loading.value = true
       axios.get("/category/all").then((response) => {
@@ -106,6 +109,8 @@ export default defineComponent({
         const data = response.data
         if (data.success) {
           categorys.value = data.content
+          level1.value = []
+          level1.value = Tool.array2Tree(categorys.value, 0)
         } else {
           message.error(data.message)
         }
@@ -154,7 +159,7 @@ export default defineComponent({
 
     return {
       param,
-      categorys,
+      level1,
       columns,
       loading,
       edit,
