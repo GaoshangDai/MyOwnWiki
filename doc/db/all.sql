@@ -37,3 +37,28 @@ create table `demo` (
 ) engine=innodb default charset=utf8mb4;
 
 insert into `demo` (id, name) values (1, 'test');
+
+drop table if exists `category`;
+create table `category` (
+      `id` bigint not null comment 'id',
+      `parent` bigint not null default 0 comment 'parent id',
+      `name` varchar(50) not null comment 'name',
+      `sort` int comment 'order',
+      primary key (`id`)
+) engine=innodb default charset=utf8mb4 comment='category';
+
+insert into `category` (id, parent, name, sort) values (100, 000, 'Front End Development', 100);
+insert into `category` (id, parent, name, sort) values (101, 100, 'Vue', 101);
+insert into `category` (id, parent, name, sort) values (102, 100, 'HTML & CSS', 102);
+insert into `category` (id, parent, name, sort) values (200, 000, 'Java', 200);
+insert into `category` (id, parent, name, sort) values (201, 200, 'Basic', 201);
+insert into `category` (id, parent, name, sort) values (202, 200, 'Framework', 202);
+insert into `category` (id, parent, name, sort) values (300, 000, 'Python', 300);
+insert into `category` (id, parent, name, sort) values (301, 300, 'Basic', 301);
+insert into `category` (id, parent, name, sort) values (302, 300, 'Advanced', 302);
+insert into `category` (id, parent, name, sort) values (400, 000, 'Database', 400);
+insert into `category` (id, parent, name, sort) values (401, 400, 'MySQL', 401);
+insert into `category` (id, parent, name, sort) values (500, 000, 'Other', 500);
+insert into `category` (id, parent, name, sort) values (501, 500, 'Server', 501);
+insert into `category` (id, parent, name, sort) values (502, 500, 'Dev Tools', 502);
+insert into `category` (id, parent, name, sort) values (503, 500, 'Popular Server-side Languages', 503);
