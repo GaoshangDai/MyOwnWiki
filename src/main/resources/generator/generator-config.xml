@@ -18,9 +18,9 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://rm-6nnx91a13d9hg7076go.mysql.rds.aliyuncs.com:3306/myownwikidev"
-                        userId="myownwikidev"
-                        password="myownwikidevABC123">
+                        connectionURL="jdbc:mysql://myownwiki.cieivaxqhrhp.us-west-1.rds.amazonaws.com:3306/myownwiki"
+                        userId="myownwiki"
+                        password="myownwiki123ABC">
         </jdbcConnection>
 
         <javaModelGenerator targetProject="src/main/java"

@@ -10,6 +10,7 @@ import com.gsdai.myownwiki.req.EbookSaveReq;
 import com.gsdai.myownwiki.resp.EbookQueryResp;
 import com.gsdai.myownwiki.resp.PageResp;
 import com.gsdai.myownwiki.util.CopyUtil;
+import com.gsdai.myownwiki.util.SnowFlake;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -21,6 +22,9 @@ public class EbookService {
 
     @Resource
     private EbookMapper ebookMapper;
+
+    @Resource
+    private SnowFlake snowFlake;
 
     public PageResp<EbookQueryResp> list(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
@@ -40,9 +44,10 @@ public class EbookService {
         return pageResp;
     }
 
-    public void edit(EbookSaveReq req) {
+    public void save(EbookSaveReq req) {
         Ebook ebook = CopyUtil.copy(req, Ebook.class);
         if (ObjectUtils.isEmpty(req.getId())) {
+            ebook.setId(snowFlake.nextId());
             ebookMapper.insert(ebook);
         } else {
             ebookMapper.updateByPrimaryKey(ebook);

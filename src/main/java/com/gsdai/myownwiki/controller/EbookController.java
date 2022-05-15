@@ -24,10 +24,10 @@ public class EbookController {
         return commonResp;
     }
 
-    @PostMapping("/edit")
-    public CommonResp edit(@RequestBody EbookSaveReq req) {
+    @PostMapping("/save")
+    public CommonResp save(@RequestBody EbookSaveReq req) {
         CommonResp commonResp = new CommonResp<>();
-        ebookService.edit(req);
+        ebookService.save(req);
         return commonResp;
     }
 }
