@@ -51,21 +51,24 @@
       :confirm-loading="modalLoading"
       @ok="handleModalOk"
   >
-    <a-form :model="category" :label-col="{ span:6 }" :wrapper-col="{ span: 18 }">
+    <a-form :model="doc" :label-col="{ span:6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="name">
-        <a-input v-model:value="category.name"/>
+        <a-input v-model:value="doc.name"/>
       </a-form-item>
-      <a-form-item label="parent id">
-        <a-select
-            ref="select"
-            v-model:value="category.parent"
+      <a-form-item label="parent docs">
+        <a-tree-select
+            v-model:value="doc.parent"
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            :tree-data="treeSelectData"
+            placeholder="Please select"
+            tree-default-expand-all
+            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
         >
-          <a-select-option value="0">None</a-select-option>
-          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="category.id === c.id">{{c.name}}</a-select-option>
-        </a-select>
+        </a-tree-select>
       </a-form-item>
       <a-form-item label="order">
-        <a-input v-model:value="category.sort" type="textarea"/>
+        <a-input v-model:value="doc.sort" type="textarea"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -78,11 +81,11 @@ import { message } from "ant-design-vue"
 import { Tool } from "../../../util/tool";
 
 export default defineComponent({
-  name: 'AdminCategory',
+  name: 'AdminDoc',
   setup() {
     const param = ref()
     param.value = {}
-    const categorys = ref()
+    const docs = ref()
     const loading = ref(false)
 
     const columns = [
@@ -106,25 +109,27 @@ export default defineComponent({
     const handleQuery = () => {
       loading.value = true
       level1.value = []
-      axios.get("/category/all").then((response) => {
+      axios.get("/doc/all").then((response) => {
         loading.value = false
         const data = response.data
         if (data.success) {
-          categorys.value = data.content
+          docs.value = data.content
           level1.value = []
-          level1.value = Tool.array2Tree(categorys.value, 0)
+          level1.value = Tool.array2Tree(docs.value, 0)
         } else {
           message.error(data.message)
         }
       })
     }
 
-    const category = ref({})
+    const doc = ref({})
     const modalVisible = ref(false)
     const modalLoading = ref(false)
+    const treeSelectData = ref()
+    treeSelectData.value = []
     const handleModalOk = () => {
       modalLoading.value = true
-      axios.post("/category/save", category.value).then((response) => {
+      axios.post("/doc/save", doc.value).then((response) => {
         modalLoading.value = false
         const data = response.data
         if (data.success) {
@@ -136,18 +141,46 @@ export default defineComponent({
       })
     }
 
+
+    const setDisable = (treeSelectData: any, id: any) => {
+      for (let i = 0; i < treeSelectData.length; i++) {
+        const node = treeSelectData[i]
+        if (node.id === id) {
+          console.log("disabled", node)
+          node.disabled = true
+
+          const children = node.children
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              setDisable(children, children[j].id)
+            }
+          }
+        } else {
+          const children = node.children
+          if (Tool.isNotEmpty(children)) {
+            setDisable(children, id)
+          }
+        }
+      }
+    }
+
     const edit = (record: any) => {
       modalVisible.value = true
-      category.value = Tool.copy(record)
+      doc.value = Tool.copy(record)
+      treeSelectData.value = Tool.copy(level1.value)
+      setDisable(treeSelectData.value, record.id)
+      treeSelectData.value.unshift({id: 0, name: 'None'})
     }
 
     const add = () => {
       modalVisible.value = true
-      category.value = {}
+      doc.value = {}
+      treeSelectData.value = Tool.copy(level1.value)
+      treeSelectData.value.unshift({id: 0, name: 'None'})
     }
 
     const handleDelete = (id: number) => {
-      axios.delete("/category/delete/" + id).then((response) => {
+      axios.delete("/doc/delete/" + id).then((response) => {
         const data = response.data
         if (data.success) {
           handleQuery()
@@ -171,7 +204,8 @@ export default defineComponent({
       modalLoading,
       handleModalOk,
       handleQuery,
-      category
+      doc,
+      treeSelectData
     }
   }
 })
