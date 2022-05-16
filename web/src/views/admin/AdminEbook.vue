@@ -37,6 +37,9 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
+        <template v-slot:category="{ text, record }">
+          <span>{{ getCategoryName(record.category1Id) }} / {{ getCategoryName(record.category2Id) }}</span>
+        </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">
@@ -70,11 +73,12 @@
       <a-form-item label="name">
         <a-input v-model:value="ebook.name"/>
       </a-form-item>
-      <a-form-item label="category1">
-        <a-input v-model:value="ebook.category1Id"/>
-      </a-form-item>
-      <a-form-item label="category2">
-        <a-input v-model:value="ebook.category2Id"/>
+      <a-form-item label="category">
+        <a-cascader
+            v-model:value="categoryIds"
+            :field-names="{label: 'name', value: 'id', children: 'children'}"
+            :options="level1"
+        />
       </a-form-item>
       <a-form-item label="description">
         <a-input v-model:value="ebook.description" type="textarea"/>
@@ -87,7 +91,7 @@
 import { defineComponent, onMounted, ref } from 'vue'
 import axios from 'axios'
 import { message } from "ant-design-vue"
-import {Tool} from "../../../util/tool";
+import { Tool } from "../../../util/tool";
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -112,13 +116,8 @@ export default defineComponent({
         dataIndex: 'name'
       },
       {
-        title: 'Category 1',
-        key: 'category1Id',
-        dataIndex: 'category1Id'
-      },
-      {
-        title: 'Category 2',
-        dataIndex: 'category2Id'
+        title: '分类',
+        slots: { customRender: 'category' }
       },
       {
         title: 'Docs',
@@ -140,6 +139,7 @@ export default defineComponent({
 
     const handleQuery = (params: any) => {
       loading.value = true
+      ebooks.value = []
       axios.get("/ebook/list", {
         params: {
           page: params.page,
@@ -167,11 +167,15 @@ export default defineComponent({
       })
     }
 
-    const ebook = ref({})
+    const ebook = ref()
     const modalVisible = ref(false)
     const modalLoading = ref(false)
+    const categoryIds = ref()
+
     const handleModalOk = () => {
       modalLoading.value = true
+      ebook.value.category1Id = categoryIds.value[0]
+      ebook.value.category2Id = categoryIds.value[1]
       axios.post("/ebook/save", ebook.value).then((response) => {
         modalLoading.value = false
         const data = response.data
@@ -190,6 +194,7 @@ export default defineComponent({
     const edit = (record: any) => {
       modalVisible.value = true
       ebook.value = Tool.copy(record)
+      categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
     }
 
     const add = () => {
@@ -205,11 +210,46 @@ export default defineComponent({
             page: pagination.value.current,
             size: pagination.value.pageSize
           })
+        } else {
+          message.error(data.message)
         }
       })
     }
 
+    const level1 =  ref()
+    let categorys: any
+
+    const handleQueryCategory = () => {
+      loading.value = true
+      axios.get("/category/all").then((response) => {
+        loading.value = false
+        const data = response.data
+        if (data.success) {
+          categorys = data.content
+          level1.value = []
+          level1.value = Tool.array2Tree(categorys, 0)
+          handleQuery({
+            page: 1,
+            size: pagination.value.pageSize,
+          })
+        } else {
+          message.error(data.message)
+        }
+      })
+    }
+
+    const getCategoryName = (cid: number) => {
+      let result = ""
+      categorys.forEach((item: any) => {
+        if (item.id === cid) {
+          result = item.name
+        }
+      })
+      return result
+    }
+
     onMounted(() => {
+      handleQueryCategory()
       handleQuery({
         page: 1,
         size: pagination.value.pageSize
@@ -223,14 +263,20 @@ export default defineComponent({
       columns,
       loading,
       handleTableChange,
+      handleQuery,
+      getCategoryName,
+
       edit,
       add,
-      handleDelete,
+
+      ebook,
       modalVisible,
       modalLoading,
       handleModalOk,
-      handleQuery,
-      ebook
+      categoryIds,
+      level1,
+
+      handleDelete
     }
   }
 })
