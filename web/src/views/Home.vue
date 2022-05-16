@@ -19,8 +19,11 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <div class="welcome" v-show="isShowWelcome">
+        <h1>Welcome to my own wiki!</h1>
+      </div>
       <a-list item-layout="vertical" size="large" :data-source="ebooks"
-              :grid="{gutter: 20, column: 3}">
+              :grid="{gutter: 20, column: 3}" v-show="!isShowWelcome">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
@@ -72,21 +75,30 @@ export default defineComponent({
       })
     }
 
-    const handleClick = () => {
-      console.log("menu click")
+    const isShowWelcome = ref(true)
+    let categoryId2 = 0
+
+    const handleQueryEbook = () => {
+      axios.get("/ebook/list", {
+        params: {
+          page: 1,
+          size: 1000,
+          categoryId2: categoryId2
+        }
+      }).then((response) => {
+        const data = response.data;
+        ebooks.value = data.content.list;
+      })
+    }
+
+    const handleClick = (value: any) => {
+      isShowWelcome.value = false
+      categoryId2 = value.key
+      handleQueryEbook()
     }
 
     onMounted(() => {
       handleQueryCategory()
-      axios.get("/ebook/list", {
-        params: {
-          page: 1,
-          size: 1000
-        }
-      }).then((res) => {
-        const data = res.data
-        ebooks.value = data.content.list
-      })
     })
 
     return {
@@ -99,7 +111,9 @@ export default defineComponent({
       ],
 
       handleClick,
-      level1
+      level1,
+
+      isShowWelcome
     }
   }
 })
