@@ -7,25 +7,21 @@
 </template>
 
 <script lang="ts">
-import {UserOutlined, LaptopOutlined, NotificationOutlined} from '@ant-design/icons-vue';
-import {defineComponent, ref} from 'vue';
-import theHeader from '@/components/theHeader.vue';
-import theFooter from "@/components/theFooter.vue";
+import {defineComponent, ref} from 'vue'
+import theHeader from '@/components/theHeader.vue'
+import theFooter from "@/components/theFooter.vue"
 
 export default defineComponent({
   components: {
     theHeader,
     theFooter,
-    UserOutlined,
-    LaptopOutlined,
-    NotificationOutlined,
   },
   setup() {
     return {
       collapsed: ref<boolean>(false),
-    };
+    }
   },
-});
+})
 </script>
 
 <style>

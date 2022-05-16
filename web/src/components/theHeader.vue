@@ -3,7 +3,7 @@
     <a-menu
         theme="dark"
         mode="horizontal"
-        v-model:selectedKeys="selectedKeys1"
+        v-model:selectedKeys="selectedKeys"
         :style="{ lineHeight: '64px' }"
     >
       <a-menu-item key="/">
@@ -23,14 +23,14 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue';
+import {defineComponent, ref} from 'vue'
 
 export default defineComponent({
   name: 'the-header',
   setup() {
     return {
-      selectedKeys1: ref<string[]>(['home']),
+      selectedKeys: ref<string[]>(['/']),
     };
   }
-});
+})
 </script>
