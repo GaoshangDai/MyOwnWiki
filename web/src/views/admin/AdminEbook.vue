@@ -106,7 +106,7 @@ export default defineComponent({
     const ebooks = ref()
     const pagination = ref({
       current: 1,
-      pageSize: 5,
+      pageSize: 10,
       total: 0
     })
     const loading = ref(false)
@@ -123,18 +123,6 @@ export default defineComponent({
       {
         title: '分类',
         slots: { customRender: 'category' }
-      },
-      {
-        title: 'Docs',
-        dataIndex: 'docCount'
-      },
-      {
-        title: 'Reads',
-        dataIndex: 'viewCount'
-      },
-      {
-        title: 'Votes',
-        dataIndex: 'voteCount'
       },
       {
         key: 'action',

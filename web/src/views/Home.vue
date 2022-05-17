@@ -26,12 +26,6 @@
               :grid="{gutter: 20, column: 3}" v-show="!isShowWelcome">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
-            <template #actions>
-              <span v-for="{ type, text } in actions" :key="type">
-                <component v-bind:is="type" style="margin-right: 8px"/>
-                {{ text }}
-              </span>
-            </template>
             <a-list-item-meta :description="item.description">
               <template #title>
                 <router-link :to="'/doc?ebookId=' + item.id">
@@ -105,12 +99,6 @@ export default defineComponent({
 
     return {
       ebooks,
-
-      actions: [
-        {type: 'StarOutlined', text: '156'},
-        {type: 'LikeOutlined', text: '156'},
-        {type: 'MessageOutlined', text: '2'},
-      ],
 
       handleClick,
       level1,

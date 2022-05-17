@@ -29,11 +29,13 @@ export default defineComponent({
   padding: 0 25px;
 }
 
+.ant-layout-footer.footer {
+  padding: 10px 50px;
+}
+
 .footer {
   position: fixed;
   width: 100%;
   bottom: 0;
-  right: 0;
-  left: 0;
 }
 </style>

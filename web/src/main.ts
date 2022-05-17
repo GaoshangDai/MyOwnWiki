@@ -4,7 +4,6 @@ import router from './router'
 import store from './store'
 import AntD from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
-import * as Icons from '@ant-design/icons-vue'
 import axios from 'axios'
 
 axios.defaults.baseURL = process.env.VUE_APP_SERVER
@@ -26,11 +25,6 @@ axios.interceptors.response.use(function (response) {
 
 const app = createApp(App);
 app.use(store).use(router).use(AntD).mount('#app')
-
-const icons : any = Icons
-for (const i in icons) {
-    app.component(i, icons[i]);
-}
 
 console.log('env: ', process.env.NODE_ENV)
 console.log('env: ', process.env.VUE_APP_SERVER)
