@@ -70,6 +70,10 @@
       <a-form-item label="order">
         <a-input v-model:value="doc.sort" type="textarea"/>
       </a-form-item>
+      <a-form-item label="content">
+        <div id="toolbar-container"></div>
+        <div id="editor-container"></div>
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
@@ -80,6 +84,8 @@ import axios from 'axios'
 import { message } from "ant-design-vue"
 import { Tool } from "../../../util/tool"
 import {useRoute} from "vue-router"
+import '@wangeditor/editor/dist/css/style.css'
+import { createEditor, createToolbar, IEditorConfig, IDomEditor, IToolbarConfig } from '@wangeditor/editor'
 
 export default defineComponent({
   name: 'AdminDoc',
@@ -129,6 +135,17 @@ export default defineComponent({
     const modalLoading = ref(false)
     const treeSelectData = ref()
     treeSelectData.value = []
+
+    const editorConfig: Partial<IEditorConfig> = {}
+    editorConfig.placeholder = 'Please input here...'
+    editorConfig.onChange = (editor: IDomEditor) => {
+      console.log('content', editor.children)
+      console.log('html', editor.getHtml())
+    }
+
+    const toolbarConfig: Partial<IToolbarConfig> = {}
+
+
     const handleModalOk = () => {
       modalLoading.value = true
       axios.post("/doc/save", doc.value).then((response) => {
@@ -142,7 +159,6 @@ export default defineComponent({
         }
       })
     }
-
 
     const setDisable = (treeSelectData: any, id: any) => {
       for (let i = 0; i < treeSelectData.length; i++) {
@@ -172,6 +188,19 @@ export default defineComponent({
       treeSelectData.value = Tool.copy(level1.value)
       setDisable(treeSelectData.value, record.id)
       treeSelectData.value.unshift({id: 0, name: 'None'})
+      setTimeout(function () {
+        const editor = createEditor({
+          selector: '#editor-container',
+          config: editorConfig,
+          mode: 'default'
+        })
+        const toolbar = createToolbar({
+          editor,
+          selector: '#toolbar-container',
+          config: toolbarConfig,
+          mode: 'default'
+        })
+      }, 100)
     }
 
     const add = () => {
@@ -181,10 +210,46 @@ export default defineComponent({
       }
       treeSelectData.value = Tool.copy(level1.value)
       treeSelectData.value.unshift({id: 0, name: 'None'})
+      setTimeout(function () {
+        const editor = createEditor({
+          selector: '#editor-container',
+          config: editorConfig,
+          mode: 'default'
+        })
+        const toolbar = createToolbar({
+          editor,
+          selector: '#toolbar-container',
+          config: toolbarConfig,
+          mode: 'default'
+        })
+      }, 100)
+    }
+
+    const ids: Array<string>[] = []
+    const getDeleteIds = (treeSelectData: any, id: any) => {
+      for (let i = 0; i < treeSelectData.length; i++) {
+        const node = treeSelectData[i]
+        if (node.id === id) {
+          ids.push(id)
+          const children = node.children
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              getDeleteIds(children, children[j].id)
+            }
+          }
+        } else {
+          const children = node.children
+          if (Tool.isNotEmpty(children)) {
+            getDeleteIds(children, id)
+          }
+        }
+      }
     }
 
     const handleDelete = (id: number) => {
-      axios.delete("/doc/delete/" + id).then((response) => {
+      ids.length = 0
+      getDeleteIds(level1.value, id)
+      axios.delete("/doc/delete/" + ids.join(",")).then((response) => {
         const data = response.data
         if (data.success) {
           handleQuery()
