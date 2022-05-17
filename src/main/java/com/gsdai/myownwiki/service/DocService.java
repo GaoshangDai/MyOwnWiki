@@ -1,7 +1,9 @@
 package com.gsdai.myownwiki.service;
 
+import com.gsdai.myownwiki.domain.Content;
 import com.gsdai.myownwiki.domain.Doc;
 import com.gsdai.myownwiki.domain.DocExample;
+import com.gsdai.myownwiki.mapper.ContentMapper;
 import com.gsdai.myownwiki.mapper.DocMapper;
 import com.gsdai.myownwiki.req.DocSaveReq;
 import com.gsdai.myownwiki.resp.DocQueryResp;
@@ -20,6 +22,9 @@ public class DocService {
     private DocMapper docMapper;
 
     @Resource
+    private ContentMapper contentMapper;
+
+    @Resource
     private SnowFlake snowFlake;
 
     public List<DocQueryResp> all() {
@@ -33,11 +38,18 @@ public class DocService {
 
     public void save(DocSaveReq req) {
         Doc doc = CopyUtil.copy(req, Doc.class);
+        Content content = CopyUtil.copy(req, Content.class);
         if (ObjectUtils.isEmpty(req.getId())) {
             doc.setId(snowFlake.nextId());
             docMapper.insert(doc);
+            content.setId(doc.getId());
+            contentMapper.insert(content);
         } else {
             docMapper.updateByPrimaryKey(doc);
+            int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            if (count == 0) {
+                contentMapper.insert(content);
+            }
         }
     }
 
