@@ -5,18 +5,18 @@
     >
       <a-row :gutter="24">
         <a-col :span="8">
-          <p>
-            <a-form
-                layout="inline"
-                :model="param"
-            >
-              <a-form-item>
-                <a-button type="primary" @click="add()">
-                  New
-                </a-button>
-              </a-form-item>
-            </a-form>
-          </p>
+<!--          <p>-->
+<!--            <a-form-->
+<!--                layout="inline"-->
+<!--                :model="param"-->
+<!--            >-->
+<!--              <a-form-item>-->
+<!--&lt;!&ndash;                <a-button type="primary" @click="add()">&ndash;&gt;-->
+<!--&lt;!&ndash;                  New&ndash;&gt;-->
+<!--&lt;!&ndash;                </a-button>&ndash;&gt;-->
+<!--              </a-form-item>-->
+<!--            </a-form>-->
+<!--          </p>-->
           <a-table
               v-if="level1.length > 0"
               :columns="columns"
@@ -79,11 +79,20 @@
               <a-input v-model:value="doc.sort" placeholder="Order"/>
             </a-form-item>
             <a-form-item>
+              <a-button type="primary" @click="handlePreviewContent">
+                <EyeOutlined /> Preview
+              </a-button>
+            </a-form-item>
+            <a-form-item>
               <div id="content"></div>
             </a-form-item>
           </a-form>
         </a-col>
       </a-row>
+
+      <a-drawer width="900" placement="right" :closable="false" :visible="drawerVisible" @close="onDrawerClose">
+        <div class="wangeditor" :innerHTML="previewHtml"></div>
+      </a-drawer>
 
     </a-layout-content>
   </a-layout>
@@ -105,6 +114,8 @@ export default defineComponent({
     param.value = {}
     const docs = ref()
     const loading = ref(false)
+    const treeSelectData = ref()
+    treeSelectData.value = []
 
     const columns = [
       {
@@ -124,13 +135,15 @@ export default defineComponent({
     const handleQuery = () => {
       loading.value = true
       level1.value = []
-      axios.get("/doc/all").then((response) => {
+      axios.get("/doc/all/" + route.query.ebookid).then((response) => {
         loading.value = false
         const data = response.data
         if (data.success) {
           docs.value = data.content
           level1.value = []
           level1.value = Tool.array2Tree(docs.value, 0)
+          treeSelectData.value = Tool.copy(level1.value)
+          treeSelectData.value.unshift({id: 0, name: 'None'})
         } else {
           message.error(data.message)
         }
@@ -138,9 +151,10 @@ export default defineComponent({
     }
 
     const doc = ref()
-    doc.value = {}
-    const treeSelectData = ref()
-    treeSelectData.value = []
+    doc.value = {
+      ebookId: route.query.ebookid
+    }
+
     const editor = new E('#content')
     editor.config.zIndex = 0
 
@@ -199,21 +213,21 @@ export default defineComponent({
       treeSelectData.value.unshift({id: 0, name: 'None'})
     }
 
-    const add = () => {
-      editor.txt.html("")
-      doc.value = {
-        ebookId: route.query.ebookid
-      }
-      treeSelectData.value = Tool.copy(level1.value)
-      treeSelectData.value.unshift({id: 0, name: 'None'})
-    }
+    // const add = () => {
+    //   editor.txt.html("")
+    //   doc.value = {
+    //     ebookId: route.query.ebookid
+    //   }
+    //   treeSelectData.value = Tool.copy(level1.value)
+    //   treeSelectData.value.unshift({id: 0, name: 'None'})
+    // }
 
-    const ids: Array<string>[] = []
+    const deleteIds: Array<string> = []
     const getDeleteIds = (treeSelectData: any, id: any) => {
       for (let i = 0; i < treeSelectData.length; i++) {
         const node = treeSelectData[i]
         if (node.id === id) {
-          ids.push(id)
+          deleteIds.push(id)
           const children = node.children
           if (Tool.isNotEmpty(children)) {
             for (let j = 0; j < children.length; j++) {
@@ -230,14 +244,25 @@ export default defineComponent({
     }
 
     const handleDelete = (id: number) => {
-      ids.length = 0
+      deleteIds.length = 0
       getDeleteIds(level1.value, id)
-      axios.delete("/doc/delete/" + ids.join(",")).then((response) => {
+      axios.delete("/doc/delete/" + deleteIds.join(",")).then((response) => {
         const data = response.data
         if (data.success) {
           handleQuery()
         }
       })
+    }
+
+    const drawerVisible = ref(false)
+    const previewHtml = ref()
+    const handlePreviewContent = () => {
+      const html = editor.txt.html()
+      previewHtml.value = html
+      drawerVisible.value = true
+    }
+    const onDrawerClose = () => {
+      drawerVisible.value = false
     }
 
     onMounted(() => {
@@ -251,12 +276,16 @@ export default defineComponent({
       columns,
       loading,
       edit,
-      add,
+      // add,
       handleDelete,
       handleSave,
       handleQuery,
       doc,
-      treeSelectData
+      treeSelectData,
+      handlePreviewContent,
+      previewHtml,
+      drawerVisible,
+      onDrawerClose
     }
   }
 })
