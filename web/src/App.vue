@@ -1,8 +1,8 @@
 <template>
   <a-layout>
-    <the-header></the-header>
+    <the-header class="header"></the-header>
     <router-view/>
-    <the-footer></the-footer>
+    <the-footer class="footer"></the-footer>
   </a-layout>
 </template>
 
@@ -25,20 +25,15 @@ export default defineComponent({
 </script>
 
 <style>
-#components-layout-demo-top-side-2 .logo {
-  float: left;
-  width: 120px;
-  height: 31px;
-  margin: 16px 24px 16px 0;
-  background: rgba(255, 255, 255, 0.3);
+.ant-layout-header.header {
+  padding: 0 25px;
 }
 
-.ant-row-rtl #components-layout-demo-top-side-2 .logo {
-  float: right;
-  margin: 16px 0 16px 24px;
-}
-
-.site-layout-background {
-  background: #fff;
+.footer {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  left: 0;
 }
 </style>

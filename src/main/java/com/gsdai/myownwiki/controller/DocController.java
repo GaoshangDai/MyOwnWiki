@@ -3,6 +3,7 @@ package com.gsdai.myownwiki.controller;
 import com.gsdai.myownwiki.req.DocSaveReq;
 import com.gsdai.myownwiki.resp.DocQueryResp;
 import com.gsdai.myownwiki.resp.CommonResp;
+import com.gsdai.myownwiki.resp.PageResp;
 import com.gsdai.myownwiki.service.DocService;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,14 @@ public class DocController {
         CommonResp commonResp = new CommonResp<>();
         List<String> list =  Arrays.asList(idsStr.split(","));
         docService.delete(list);
+        return commonResp;
+    }
+
+    @GetMapping("/find-content/{id}")
+    public CommonResp findContent(@PathVariable Long id) {
+        CommonResp<String> commonResp = new CommonResp<>();
+        String content = docService.findContent(id);
+        commonResp.setContent(content);
         return commonResp;
     }
 }

@@ -139,21 +139,17 @@ export default defineComponent({
 
     const doc = ref()
     doc.value = {}
-    const modalVisible = ref(false)
-    const modalLoading = ref(false)
     const treeSelectData = ref()
     treeSelectData.value = []
     const editor = new E('#content')
     editor.config.zIndex = 0
 
     const handleSave = () => {
-      modalLoading.value = true
       doc.value.content = editor.txt.html()
       axios.post("/doc/save", doc.value).then((response) => {
-        modalLoading.value = false
         const data = response.data
         if (data.success) {
-          modalVisible.value = false
+          message.success("Save Successfully!")
           handleQuery()
         } else {
           message.error(data.message)
@@ -183,16 +179,28 @@ export default defineComponent({
       }
     }
 
+    const handleQueryContent = () => {
+      axios.get("/doc/find-content/" + doc.value.id).then((response) => {
+        const data = response.data
+        if (data.success) {
+          editor.txt.html(data.content)
+        } else {
+          message.error(data.message)
+        }
+      })
+    }
+
     const edit = (record: any) => {
-      modalVisible.value = true
+      editor.txt.html("")
       doc.value = Tool.copy(record)
+      handleQueryContent()
       treeSelectData.value = Tool.copy(level1.value)
       setDisable(treeSelectData.value, record.id)
       treeSelectData.value.unshift({id: 0, name: 'None'})
     }
 
     const add = () => {
-      modalVisible.value = true
+      editor.txt.html("")
       doc.value = {
         ebookId: route.query.ebookid
       }
@@ -245,8 +253,6 @@ export default defineComponent({
       edit,
       add,
       handleDelete,
-      modalVisible,
-      modalLoading,
       handleSave,
       handleQuery,
       doc,
