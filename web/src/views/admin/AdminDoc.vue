@@ -3,79 +3,90 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <p>
-        <a-form
-            layout="inline"
-            :model="param"
-        >
-          <a-form-item>
-            <a-button type="primary" @click="add()">
-              New
-            </a-button>
-          </a-form-item>
-        </a-form>
-      </p>
-      <a-table
-          :columns="columns"
-          :row-key="record => record.id"
-          :data-source="level1"
-          :loading="loading"
-          :pagination="false"
-      >
-        <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar"/>
-        </template>
-        <template v-slot:action="{ text, record }">
-          <a-space size="small">
-            <a-button type="primary" @click="edit(record)">
-              Edit
-            </a-button>
-            <a-popconfirm
-                title="Are you sure delete this item?"
-                ok-text="Yes"
-                cancel-text="No"
-                @confirm="handleDelete(record.id)"
+      <a-row :gutter="24">
+        <a-col :span="8">
+          <p>
+            <a-form
+                layout="inline"
+                :model="param"
             >
-              <a-button type="danger">
-                Delete
-              </a-button>
-            </a-popconfirm>
-          </a-space>
-        </template>
-      </a-table>
+              <a-form-item>
+                <a-button type="primary" @click="add()">
+                  New
+                </a-button>
+              </a-form-item>
+            </a-form>
+          </p>
+          <a-table
+              v-if="level1.length > 0"
+              :columns="columns"
+              :row-key="record => record.id"
+              :data-source="level1"
+              :loading="loading"
+              :pagination="false"
+              size="small"
+              :defaultExpandAllRows="true"
+          >
+            <template #name="{ text, record }">
+              {{record.sort}} {{text}}
+            </template>
+            <template v-slot:action="{ text, record }">
+              <a-space size="small">
+                <a-button type="primary" @click="edit(record)" size="small">
+                  Edit
+                </a-button>
+                <a-popconfirm
+                    title="Are you sure delete this item?"
+                    ok-text="Yes"
+                    cancel-text="No"
+                    @confirm="handleDelete(record.id)"
+                >
+                  <a-button type="danger" size="small">
+                    Delete
+                  </a-button>
+                </a-popconfirm>
+              </a-space>
+            </template>
+          </a-table>
+        </a-col>
+        <a-col :span="16">
+          <p>
+            <a-form layout="inline" :model="param">
+              <a-form-item>
+                <a-button type="primary" @click="handleSave">
+                  Save
+                </a-button>
+              </a-form-item>
+            </a-form>
+          </p>
+          <a-form :model="doc" layout="vertical">
+            <a-form-item>
+              <a-input v-model:value="doc.name" placeholder="Name"/>
+            </a-form-item>
+            <a-form-item>
+              <a-tree-select
+                  v-model:value="doc.parent"
+                  style="width: 100%"
+                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                  :tree-data="treeSelectData"
+                  placeholder="Please select"
+                  tree-default-expand-all
+                  :replaceFields="{title: 'name', key: 'id', value: 'id'}"
+              >
+              </a-tree-select>
+            </a-form-item>
+            <a-form-item>
+              <a-input v-model:value="doc.sort" placeholder="Order"/>
+            </a-form-item>
+            <a-form-item>
+              <div id="content"></div>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
+
     </a-layout-content>
   </a-layout>
-  <a-modal
-      title="Categories Table"
-      v-model:visible="modalVisible"
-      :confirm-loading="modalLoading"
-      @ok="handleModalOk"
-  >
-    <a-form :model="doc" :label-col="{ span:6 }" :wrapper-col="{ span: 18 }">
-      <a-form-item label="name">
-        <a-input v-model:value="doc.name"/>
-      </a-form-item>
-      <a-form-item label="parent docs">
-        <a-tree-select
-            v-model:value="doc.parent"
-            style="width: 100%"
-            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-            :tree-data="treeSelectData"
-            placeholder="Please select"
-            tree-default-expand-all
-            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
-        >
-        </a-tree-select>
-      </a-form-item>
-      <a-form-item label="order">
-        <a-input v-model:value="doc.sort" type="textarea"/>
-      </a-form-item>
-      <a-form-item label="content">
-        <div id="toolbar-container"></div>
-        <div id="editor-container"></div>
-      </a-form-item>
-    </a-form>
-  </a-modal>
 </template>
 
 <script lang="ts">
@@ -84,8 +95,7 @@ import axios from 'axios'
 import { message } from "ant-design-vue"
 import { Tool } from "../../../util/tool"
 import {useRoute} from "vue-router"
-import '@wangeditor/editor/dist/css/style.css'
-import { createEditor, createToolbar, IEditorConfig, IDomEditor, IToolbarConfig } from '@wangeditor/editor'
+import E from 'wangeditor'
 
 export default defineComponent({
   name: 'AdminDoc',
@@ -99,11 +109,8 @@ export default defineComponent({
     const columns = [
       {
         title: 'Name',
-        dataIndex: 'name'
-      },
-      {
-        title: 'Order',
-        dataIndex: 'sort'
+        dataIndex: 'name',
+        slots: {customRender: 'name'}
       },
       {
         key: 'action',
@@ -135,18 +142,10 @@ export default defineComponent({
     const modalLoading = ref(false)
     const treeSelectData = ref()
     treeSelectData.value = []
+    const editor = new E('#content')
+    editor.config.zIndex = 0
 
-    const editorConfig: Partial<IEditorConfig> = {}
-    editorConfig.placeholder = 'Please input here...'
-    editorConfig.onChange = (editor: IDomEditor) => {
-      console.log('content', editor.children)
-      console.log('html', editor.getHtml())
-    }
-
-    const toolbarConfig: Partial<IToolbarConfig> = {}
-
-
-    const handleModalOk = () => {
+    const handleSave = () => {
       modalLoading.value = true
       axios.post("/doc/save", doc.value).then((response) => {
         modalLoading.value = false
@@ -188,19 +187,6 @@ export default defineComponent({
       treeSelectData.value = Tool.copy(level1.value)
       setDisable(treeSelectData.value, record.id)
       treeSelectData.value.unshift({id: 0, name: 'None'})
-      setTimeout(function () {
-        const editor = createEditor({
-          selector: '#editor-container',
-          config: editorConfig,
-          mode: 'default'
-        })
-        const toolbar = createToolbar({
-          editor,
-          selector: '#toolbar-container',
-          config: toolbarConfig,
-          mode: 'default'
-        })
-      }, 100)
     }
 
     const add = () => {
@@ -210,19 +196,6 @@ export default defineComponent({
       }
       treeSelectData.value = Tool.copy(level1.value)
       treeSelectData.value.unshift({id: 0, name: 'None'})
-      setTimeout(function () {
-        const editor = createEditor({
-          selector: '#editor-container',
-          config: editorConfig,
-          mode: 'default'
-        })
-        const toolbar = createToolbar({
-          editor,
-          selector: '#toolbar-container',
-          config: toolbarConfig,
-          mode: 'default'
-        })
-      }, 100)
     }
 
     const ids: Array<string>[] = []
@@ -259,6 +232,7 @@ export default defineComponent({
 
     onMounted(() => {
       handleQuery()
+      editor.create()
     })
 
     return {
@@ -271,7 +245,7 @@ export default defineComponent({
       handleDelete,
       modalVisible,
       modalLoading,
-      handleModalOk,
+      handleSave,
       handleQuery,
       doc,
       treeSelectData
